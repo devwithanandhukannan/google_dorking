@@ -1,0 +1,29 @@
+{
+  "categories": {
+    "Files & Documents": [
+      {"name": "PDF Files", "dork": "site:{domain} filetype:pdf"},
+      {"name": "Excel Files", "dork": "site:{domain} filetype:xls OR filetype:xlsx"},
+      {"name": "Word Documents", "dork": "site:{domain} filetype:doc OR filetype:docx"},
+      {"name": "PowerPoint", "dork": "site:{domain} filetype:ppt OR filetype:pptx"},
+      {"name": "Text Files", "dork": "site:{domain} filetype:txt"},
+      {"name": "CSV Files", "dork": "site:{domain} filetype:csv"},
+      {"name": "SQL Files", "dork": "site:{domain} filetype:sql"},
+      {"name": "Log Files", "dork": "site:{domain} filetype:log"}
+    ],
+    "Sensitive Information": [
+      {"name": "Email Addresses", "dork": "site:{domain} intext:\"@{domain}\""},
+      {"name": "Admin Pages", "dork": "site:{domain} inurl:admin OR inurl:administrator"},
+      {"name": "Login Pages", "dork": "site:{domain} inurl:login OR inurl:signin"},
+      {"name": "Config Files", "dork": "site:{domain} filetype:conf OR filetype:config"},
+      {"name": "Database Files", "dork": "site:{domain} filetype:sql OR filetype:db"},
+      {"name": "API Keys", "dork": "site:{domain} intext:\"api_key\" OR intext:\"apikey\""}
+    ],
+    "Security & Vulnerabilities": [
+      {"name": "Directory Listing", "dork": "site:{domain} intitle:\"index of\""},
+      {"name": "Error Messages", "dork": "site:{domain} intext:\"error\" OR intext:\"warning\""},
+      {"name": "phpinfo()", "dork": "site:{domain} inurl:phpinfo.php"},
+      {"name": "Git Exposed", "dork": "site:{domain} inurl:.git"},
+      {"name": "ENV Files", "dork": "site:{domain} filetype:env"}
+    ]
+  }
+}

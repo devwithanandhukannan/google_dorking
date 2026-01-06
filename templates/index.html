@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSINT Footprint Tool v1.0</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="desktop">
+        <!-- Main Window -->
+        <div class="window" id="main-window">
+            <div class="title-bar">
+                <div class="title-bar-text">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAggAAAIIBsKhZvgAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADSSURBVCiRpdKxSgNBEAbgb/YSG4tUNmJhIVj4AL6Br+IbWPkGVpYWPoGNIIiVYCEIgoWFICKIoMVdcpfbmd1xbhMT/GGZndn5Z2aXKKX4j7r/An3AC1aRmZcR8Rlj/BFCuImIt4h47Cxzsznnp5l5HhFPEdF03ntmXq61Xi6C9X3/WVXV3jxl5nlEHGbmxey5bdtq8mNm3kbENznni4iobdt+stb6AdhGxFJELHeOvfcel9P/J6rOefyJGMPeN+gu/4F9b9rRENGMXyMz9yLiYAH8AgTIM9T3ev7kAAAAAElFTkSuQmCC" alt="">
+                    OSINT Footprint Tool v1.0
+                </div>
+                
+            </div>
+            
+           
+
+            <div class="window-body">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <button class="toolbar-btn" id="select-all-btn" title="Select All">
+                        <span class="toolbar-icon">☑</span>
+                        <span class="toolbar-text">Select All</span>
+                    </button>
+                    <button class="toolbar-btn" id="deselect-all-btn" title="Deselect All">
+                        <span class="toolbar-icon">☐</span>
+                        <span class="toolbar-text">Clear All</span>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <button class="toolbar-btn" id="generate-btn" title="Generate Dorks">
+                        <span class="toolbar-icon">▶</span>
+                        <span class="toolbar-text">Generate</span>
+                    </button>
+                    <button class="toolbar-btn" id="export-btn" title="Export Results" style="display: none;">
+                        <span class="toolbar-icon">💾</span>
+                        <span class="toolbar-text">Export</span>
+                    </button>
+                    <div class="toolbar-separator"></div>
+                    <div class="toolbar-info">
+                        <span>Selected: <strong id="selected-count">0</strong></span>
+                        <span>Total: <strong id="total-count">0</strong></span>
+                    </div>
+                </div>
+
+                <div class="main-container">
+                    <!-- Left Panel - Configuration -->
+                    <div class="panel config-panel">
+                        <div class="panel-header">
+                            <span class="panel-icon">⚙</span> Configuration
+                        </div>
+                        <div class="panel-body">
+                            <div class="field-row">
+                                <label for="target">Target Domain:</label>
+                                <input type="text" id="target" placeholder="example.com">
+                            </div>
+                            <div class="field-row">
+                                <label for="search-engine">Search Engine:</label>
+                                <select id="search-engine">
+                                    <option value="google">Google</option>
+                                    <option value="bing">Bing</option>
+                                    <option value="duckduckgo">DuckDuckGo</option>
+                                    <option value="yahoo">Yahoo</option>
+                                    <option value="yandex">Yandex</option>
+                                    <option value="baidu">Baidu</option>
+                                </select>
+                            </div>
+                            <div class="field-row">
+                                <label for="custom-query">Custom Dork:</label>
+                                <textarea id="custom-query" rows="3" placeholder="site:example.com filetype:pdf"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Middle Panel - Dorks Selection -->
+                    <div class="panel dorks-panel">
+                        <div class="panel-header">
+                            <span class="panel-icon">📋</span> Select Dorks
+                        </div>
+                        <div class="panel-body">
+                            <div class="treeview" id="dorks-container">
+                                {% for category, dorks_list in dorks.categories.items() %}
+                                {% set outer_loop = loop %}
+                                <div class="tree-category">
+                                    <div class="tree-category-header">
+                                        <input type="checkbox" class="category-checkbox" id="cat-{{ outer_loop.index }}" data-category="{{ category }}">
+                                        <label for="cat-{{ outer_loop.index }}" class="tree-label">
+                                            <span class="tree-icon">📁</span>
+                                            {{ category }}
+                                            <span class="count-badge">({{ dorks_list|length }})</span>
+                                        </label>
+                                    </div>
+                                    <div class="tree-items">
+                                        {% for dork in dorks_list %}
+                                        <div class="tree-item">
+                                            <input type="checkbox" 
+                                                   class="dork-checkbox" 
+                                                   id="dork-{{ outer_loop.index }}-{{ loop.index }}" 
+                                                   data-category="{{ category }}"
+                                                   data-name="{{ dork.name }}"
+                                                   data-dork="{{ dork.dork }}"
+                                                   data-desc="{{ dork.desc }}">
+                                            <label for="dork-{{ outer_loop.index }}-{{ loop.index }}" class="tree-label">
+                                                <span class="tree-icon">📄</span>
+                                                <span class="dork-name">{{ dork.name }}</span>
+                                            </label>
+                                            <div class="dork-tooltip">{{ dork.desc }}</div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Results -->
+                    <div class="panel results-panel" id="results-panel">
+                        <div class="panel-header">
+                            <span class="panel-icon">📊</span> Results
+                            <span id="results-count" class="results-badge">0</span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="results-toolbar">
+                                <button class="btn-small" id="copy-all-btn" title="Copy All URLs">
+                                    📋 Copy URLs
+                                </button>
+                                <button class="btn-small" id="open-all-btn" title="Open All in Tabs">
+                                    🔗 Open All
+                                </button>
+                                <button class="btn-small" id="export-txt-btn" title="Export as TXT">
+                                    📄 TXT
+                                </button>
+                                <button class="btn-small" id="export-html-btn" title="Export as HTML">
+                                    🌐 HTML
+                                </button>
+                            </div>
+                            <div class="results-list" id="results-container">
+                                <div class="empty-state">
+                                    <div class="empty-icon">🔍</div>
+                                    <div class="empty-text">No results yet</div>
+                                    <div class="empty-hint">Select dorks and click Generate</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar">
+                <div class="status-item">
+                    <span id="status-text">Ready</span>
+                </div>
+                <div class="status-item">
+                    <span id="status-time"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Dialog -->
+        <div class="dialog" id="loading-dialog" style="display: none;">
+            <div class="dialog-window">
+                <div class="title-bar">
+                    <div class="title-bar-text">Processing...</div>
+                </div>
+                <div class="dialog-body">
+                    <div class="loading-animation">
+                        <div class="loading-bar"></div>
+                    </div>
+                    <p id="loading-text">Generating dork links...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning Footer -->
+        <div class="taskbar">
+            
+            <div class="taskbar-items">
+                <div class="taskbar-item active">OSINT Tool</div>
+            </div>
+            <div class="system-tray">
+                <span class="tray-icon">🔒</span>
+                <span class="tray-icon">📡</span>
+                <span class="tray-time" id="tray-time"></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
