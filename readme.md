@@ -146,4 +146,4 @@ osint/
 │   └── script.js       # Frontend JavaScript
 └── venv/               # Virtual environment
 ```
-[sample image](./image_one.png)
+![sample image](./image_one.png)
