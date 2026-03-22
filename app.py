@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 import io
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
 # Enhanced Google Dorks Database - More Aggressive
 def get_default_dorks():
